@@ -1,0 +1,215 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Sparkles, Volume2 } from 'lucide-react';
+import Layout from '../components/Layout';
+import { categories, mockQuestions } from '../data/mockData';
+
+export default function EditQuestionPage() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [category, setCategory] = useState('');
+  const [tags, setTags] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
+  const [isGeneratingAnswer, setIsGeneratingAnswer] = useState(false);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+
+  useEffect(() => {
+    // Load existing question data
+    const existingQuestion = mockQuestions.find(q => q.id === id);
+    if (existingQuestion) {
+      setQuestion(existingQuestion.question);
+      setAnswer(existingQuestion.answer);
+      setCategory(existingQuestion.category);
+      setTags(existingQuestion.tags.join(', '));
+      setIsPublic(existingQuestion.isPublic);
+    } else {
+      // Question not found, redirect to dashboard
+      navigate('/dashboard');
+    }
+  }, [id, navigate]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Placeholder save logic
+    alert('Question updated successfully! (placeholder)');
+    navigate('/dashboard');
+  };
+
+  const handleGenerateAnswer = async () => {
+    if (!question.trim()) {
+      alert('Please enter a question first');
+      return;
+    }
+    
+    setIsGeneratingAnswer(true);
+    // Placeholder AI generation
+    setTimeout(() => {
+      setAnswer('This is a placeholder AI-generated answer. In the real implementation, this would be generated based on the question using AI.');
+      setIsGeneratingAnswer(false);
+    }, 2000);
+  };
+
+  const handleGenerateAudio = async () => {
+    if (!answer.trim()) {
+      alert('Please enter or generate an answer first');
+      return;
+    }
+    
+    setIsGeneratingAudio(true);
+    // Placeholder audio generation
+    setTimeout(() => {
+      alert('Audio generated successfully! (placeholder)');
+      setIsGeneratingAudio(false);
+    }, 3000);
+  };
+
+  return (
+    <Layout>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pt-8">
+        <div className="flex items-center mb-8">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="mr-4 p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div className="ml-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Edit Question</h1>
+            <p className="mt-2 text-gray-600 dark:text-gray-400">
+              Update your interview question
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="space-y-6">
+              <div>
+                <label htmlFor="question" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Question *
+                </label>
+                <textarea
+                  id="question"
+                  required
+                  rows={3}
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Enter your interview question..."
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="answer" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Answer *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateAnswer}
+                    disabled={isGeneratingAnswer}
+                    className="inline-flex items-center px-3 py-1 text-sm bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded-md hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors disabled:opacity-50"
+                  >
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    {isGeneratingAnswer ? 'Generating...' : 'Regenerate with AI'}
+                  </button>
+                </div>
+                <textarea
+                  id="answer"
+                  required
+                  rows={6}
+                  value={answer}
+                  onChange={(e) => setAnswer(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Enter your answer or generate one using AI..."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Category *
+                  </label>
+                  <select
+                    id="category"
+                    required
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Tags
+                  </label>
+                  <input
+                    id="tags"
+                    type="text"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter tags separated by commas"
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    Separate multiple tags with commas
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="isPublic"
+                    type="checkbox"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                  />
+                  <label htmlFor="isPublic" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Make this question public
+                  </label>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleGenerateAudio}
+                  disabled={isGeneratingAudio}
+                  className="inline-flex items-center px-3 py-2 text-sm bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-md hover:bg-green-200 dark:hover:bg-green-800 transition-colors disabled:opacity-50"
+                >
+                  <Volume2 className="h-4 w-4 mr-2" />
+                  {isGeneratingAudio ? 'Generating Audio...' : 'Generate Audio'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard')}
+              className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Update Question
+            </button>
+          </div>
+        </form>
+      </div>
+    </Layout>
+  );
+}
