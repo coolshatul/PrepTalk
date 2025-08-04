@@ -4,6 +4,8 @@ import { ArrowLeft, Sparkles, Volume2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { categories } from '../data/mockData';
 import { toast } from 'sonner';
+import { api } from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AddQuestionPage() {
   const navigate = useNavigate();
@@ -14,12 +16,26 @@ export default function AddQuestionPage() {
   const [isPublic, setIsPublic] = useState(false);
   const [isGeneratingAnswer, setIsGeneratingAnswer] = useState(false);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+  const { token } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder save logic
-    toast.success('Question saved successfully! (placeholder)');
-    navigate('/dashboard');
+
+    const payload = {
+      question,
+      answer,
+      category,
+      tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag),
+      isPublic,
+    };
+
+    try {
+      await api.post('/createQuestion', payload, token || undefined);
+      toast.success('Question saved successfully!');
+      navigate('/dashboard');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save question');
+    }
   };
 
   const handleGenerateAnswer = async () => {

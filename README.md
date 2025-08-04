@@ -79,7 +79,7 @@ You can deploy the frontend easily on:
 
 ## 👥 Team
 
-This tool is being built by Shatul and a team of 5 developers for learning and real interview preparation.
+This tool is being built by Shatul for learning and real interview preparation.
 
 ---
 

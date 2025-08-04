@@ -1,3 +1,4 @@
+import { api } from '@/lib/api';
 import { supabase } from '../../lib/supabaseClient';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,10 +9,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const { error, data: authData } = await supabase.auth.signInWithPassword({
         email,
@@ -20,16 +23,21 @@ export default function LoginPage() {
 
       if (error) {
         alert(error.message);
+        setLoading(false);
       } else {
         const session = authData.session;
         if (session) {
+          await api.post('/auth/sync-user', null, session.access_token);
+          setLoading(false);
           navigate('/dashboard');
         } else {
           alert('Login failed: No session received');
+          setLoading(false);
         }
       }
     } catch (err) {
       alert('Login failed. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -101,9 +109,10 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                disabled={loading}
+                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Sign in
+                {loading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
 

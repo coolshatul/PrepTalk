@@ -1,6 +1,5 @@
-import React from 'react';
 import { Edit, Trash2, Play, Globe, Lock, Tag } from 'lucide-react';
-import { Question } from '../data/mockData';
+import { Question } from '@/types';
 
 interface QuestionCardProps {
   question: Question;
@@ -10,12 +9,11 @@ interface QuestionCardProps {
   showAuthor?: boolean;
 }
 
-export default function QuestionCard({ 
-  question, 
-  onEdit, 
-  onDelete, 
-  onPlayAudio, 
-  showAuthor = false 
+export default function QuestionCard({
+  question,
+  onEdit,
+  onDelete,
+  onPlayAudio,
 }: QuestionCardProps) {
   const truncateText = (text: string, maxLength: number) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
@@ -29,12 +27,12 @@ export default function QuestionCard({
             {question.category}
           </span>
           {question.isPublic ? (
-            <Globe className="h-4 w-4 text-green-500" title="Public" />
+            <Globe className="h-4 w-4 text-green-500" />
           ) : (
-            <Lock className="h-4 w-4 text-gray-400" title="Private" />
+            <Lock className="h-4 w-4 text-gray-400" />
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {question.hasAudio && onPlayAudio && (
             <button
@@ -69,13 +67,13 @@ export default function QuestionCard({
       <h3 className="font-semibold text-gray-900 dark:text-white mb-2 leading-snug">
         {truncateText(question.question, 120)}
       </h3>
-      
+
       <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">
         {truncateText(question.answer, 150)}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-3">
-        {question.tags.map((tag) => (
+        {question.tags?.map((tag) => (
           <span
             key={tag}
             className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full"
@@ -86,12 +84,12 @@ export default function QuestionCard({
         ))}
       </div>
 
-      <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
+      {/* <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
         <span>{new Date(question.createdAt).toLocaleDateString()}</span>
         {showAuthor && question.author && (
           <span>by {question.author}</span>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }
