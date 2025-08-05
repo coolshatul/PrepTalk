@@ -20,7 +20,7 @@ export default function PublicQuestionsPage() {
     async function fetchQuestions() {
       try {
         const res = await api.get('/getPublicQuestions', token || undefined);
-        setQuestions(res.data?.data || []);
+        setQuestions(res.data || []);
       } catch (err: any) {
         toast.error(err.message || 'Failed to load public questions');
       } finally {

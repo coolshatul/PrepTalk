@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import Layout from '../components/Layout';
 import QuestionCard from '../components/QuestionCard';
 import Filters from '../components/Filters';
+import AudioPlayerModal from '../components/AudioPlayerModal';
 import { useAuth } from '@/hooks/useAuth';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
@@ -18,11 +19,14 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useAuth();
 
+  const [showModal, setShowModal] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
   useEffect(() => {
     async function fetchQuestions() {
       try {
         const res = await api.get('/getMyQuestions', token || undefined);
-        setQuestions(res.data?.data || []);
+        setQuestions(res.data || []);
       } catch (err: any) {
         toast.error(err.message || 'Failed to load questions');
       } finally {
@@ -69,9 +73,21 @@ export default function DashboardPage() {
     }
   };
 
-  const handlePlayAudio = (id: string) => {
-    // Placeholder audio logic
-    alert(`Play audio for question ${id} (placeholder)`);
+  const handlePlayAudio = async (audioKey: string) => {
+    try {
+      const res = await api.post('/playAudio', { audioKey }, token || undefined);
+      const url = res?.data?.signedUrl;
+      if (!url) {
+        toast.error('No audio available.');
+        return;
+      }
+
+      setAudioUrl(url);
+      setShowModal(true);
+    } catch (err: any) {
+      console.error('Error playing audio:', err);
+      toast.error(err.message || 'Failed to play audio');
+    }
   };
 
   return (
@@ -144,6 +160,11 @@ export default function DashboardPage() {
           )}
         </div>
       )}
+      <AudioPlayerModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        audioUrl={audioUrl || ''}
+      />
     </Layout>
   );
 }

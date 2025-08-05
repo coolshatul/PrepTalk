@@ -1,5 +1,9 @@
-import { Edit, Trash2, Play, Globe, Lock, Tag } from 'lucide-react';
+import { Edit, Trash2, Play, Globe, Lock, Tag, Volume2 } from 'lucide-react';
 import { Question } from '@/types';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { api } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 interface QuestionCardProps {
   question: Question;
@@ -15,6 +19,21 @@ export default function QuestionCard({
   onDelete,
   onPlayAudio,
 }: QuestionCardProps) {
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const { token } = useAuth();
+
+  const handleGenerateAudio = async (id: string) => {
+    try {
+      setLoadingId(id);
+      await api.post('/generateAudio', { questionId: id }, token || undefined);
+      toast.success('Audio generated successfully');
+    } catch (error) {
+      toast.error('Failed to generate audio');
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   const truncateText = (text: string, maxLength: number) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
@@ -34,9 +53,19 @@ export default function QuestionCard({
         </div>
 
         <div className="flex items-center space-x-2">
-          {question.hasAudio && onPlayAudio && (
+          {!question.hasAudio && (
             <button
-              onClick={() => onPlayAudio(question.id)}
+              onClick={() => handleGenerateAudio(question.id)}
+              className="p-1 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20 rounded"
+              title="Generate Audio"
+              disabled={loadingId === question.id}
+            >
+              <Volume2 className="h-4 w-4 animate-pulse" />
+            </button>
+          )}
+          {question.audioKey && onPlayAudio && (
+            <button
+              onClick={() => onPlayAudio(question.audioKey!)}
               className="p-1 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded"
               title="Play Audio"
             >
@@ -83,13 +112,6 @@ export default function QuestionCard({
           </span>
         ))}
       </div>
-
-      {/* <div className="flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-        <span>{new Date(question.createdAt).toLocaleDateString()}</span>
-        {showAuthor && question.author && (
-          <span>by {question.author}</span>
-        )}
-      </div> */}
     </div>
   );
 }

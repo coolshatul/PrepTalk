@@ -12,7 +12,7 @@ export interface Question {
   category?: string;
   tags?: string[];
   isPublic?: boolean;
-  audioUrl?: string;
+  audioKey?: string;
   hasAudio?: boolean;
   createdAt?: string;
   updatedAt?: string;
