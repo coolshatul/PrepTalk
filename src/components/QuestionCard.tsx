@@ -9,7 +9,7 @@ interface QuestionCardProps {
   question: Question;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
-  onPlayAudio?: (id: string) => void;
+  onPlayAudio?: (question: Question) => void;
   showAuthor?: boolean;
 }
 
@@ -27,6 +27,7 @@ export default function QuestionCard({
       setLoadingId(id);
       await api.post('/generateAudio', { questionId: id }, token || undefined);
       toast.success('Audio generated successfully');
+      question.audioKey = 'generated'; // Simulate audioKey to force re-render
     } catch (error) {
       toast.error('Failed to generate audio');
     } finally {
@@ -53,19 +54,26 @@ export default function QuestionCard({
         </div>
 
         <div className="flex items-center space-x-2">
-          {!question.hasAudio && (
+          {!question.audioKey && (
             <button
               onClick={() => handleGenerateAudio(question.id)}
               className="p-1 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20 rounded"
               title="Generate Audio"
               disabled={loadingId === question.id}
             >
-              <Volume2 className="h-4 w-4 animate-pulse" />
+              {loadingId === question.id ? (
+                <svg className="animate-spin h-4 w-4 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+              ) : (
+                <Volume2 className="h-4 w-4" />
+              )}
             </button>
           )}
           {question.audioKey && onPlayAudio && (
             <button
-              onClick={() => onPlayAudio(question.audioKey!)}
+              onClick={() => onPlayAudio(question)}
               className="p-1 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded"
               title="Play Audio"
             >

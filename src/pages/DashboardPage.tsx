@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useAuth();
@@ -73,9 +74,9 @@ export default function DashboardPage() {
     }
   };
 
-  const handlePlayAudio = async (audioKey: string) => {
+  const handlePlayAudio = async (question: Question) => {
     try {
-      const res = await api.post('/playAudio', { audioKey }, token || undefined);
+      const res = await api.post('/playAudio', { audioKey: question.audioKey }, token || undefined);
       const url = res?.data?.signedUrl;
       if (!url) {
         toast.error('No audio available.');
@@ -83,6 +84,7 @@ export default function DashboardPage() {
       }
 
       setAudioUrl(url);
+      setSelectedQuestion(question);
       setShowModal(true);
     } catch (err: any) {
       console.error('Error playing audio:', err);
@@ -164,6 +166,7 @@ export default function DashboardPage() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         audioUrl={audioUrl || ''}
+        questionTitle={selectedQuestion?.question}
       />
     </Layout>
   );

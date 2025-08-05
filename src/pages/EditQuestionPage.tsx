@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Volume2 } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import Layout from '../components/Layout';
 import { categories } from '../data/mockData';
 import { api } from '@/lib/api';
@@ -147,7 +147,11 @@ export default function EditQuestionPage() {
                       onChange={(e) => setAnswer(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       placeholder="Enter your answer or generate one using AI..."
+                      maxLength={2500}
                     />
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-right">
+                      {answer.length}/2500 characters
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
